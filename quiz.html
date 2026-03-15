@@ -15,64 +15,20 @@
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;}
 
-/* ── NAV (redesigned to match screenshot) ── */
-.nav{
-  position:sticky;top:0;z-index:200;
-  background:#0d1117;
-  border-bottom:1px solid #1e2a3a;
-  padding:0 28px;
-  display:flex;align-items:center;justify-content:space-between;
-  height:72px;
-  gap:16px;
-}
-.nav-logo{display:flex;align-items:center;gap:12px;min-width:0;}
-.nav-logo-icon{
-  width:44px;height:44px;
-  background:linear-gradient(135deg,#f9a825,#f57c00);
-  border-radius:11px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Fira Code',monospace;font-size:0.82rem;font-weight:800;
-  color:#000;flex-shrink:0;
-  box-shadow:0 3px 12px rgba(249,168,37,0.35);
-  letter-spacing:-0.5px;
-}
-.nav-title{font-weight:800;font-size:0.9rem;color:#e8f0fb;line-height:1.25;}
-.nav-sub{font-size:0.68rem;color:#4e6080;line-height:1.3;margin-top:1px;}
-.nav-instructor{font-size:0.68rem;color:#f9c33a;font-weight:700;line-height:1.3;margin-top:1px;letter-spacing:0.2px;}
-.nav-links{display:flex;gap:6px;align-items:center;flex-shrink:0;}
-/* Base nav button */
-.nav-link{
-  padding:8px 16px;border-radius:9px;
-  font-size:0.82rem;font-weight:700;
-  color:#6b7f99;text-decoration:none;cursor:pointer;
-  border:1.5px solid #1e2a3a;
-  background:#131b27;
-  transition:all 0.18s;
-  display:inline-flex;align-items:center;gap:7px;
-  white-space:nowrap;
-}
-.nav-link:hover{color:#c8d8ef;border-color:#2a3d55;background:#1a2436;}
-/* Active = Quiz — golden border */
-.nav-link.active{
-  color:#e8f0fb;
-  border-color:#f9c33a;
-  background:rgba(249,195,58,0.07);
-  box-shadow:0 0 0 1px rgba(249,195,58,0.12);
-}
-/* Home */
-.nav-link.home-link{border-color:#1e2a3a;}
-/* Practical — teal accent */
-.nav-link.practical-link{
-  border-color:rgba(0,230,210,0.35);
-  color:#00e6d2;
-  background:rgba(0,230,210,0.05);
-}
-.nav-link.practical-link:hover{
-  border-color:#00e6d2;
-  background:rgba(0,230,210,0.09);
-  color:#5ff5e8;
-}
-.nav-divider{width:1px;height:20px;background:#1e2a3a;margin:0 2px;}
+.nav{position:sticky;top:0;z-index:200;background:rgba(7,9,15,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:66px;}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.nav-logo-icon{width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Fira Code',monospace;font-size:0.75rem;font-weight:600;color:#000;flex-shrink:0;}
+.nav-title{font-weight:700;font-size:0.82rem;color:var(--text);line-height:1.3;}
+.nav-sub{font-size:0.62rem;color:var(--muted);line-height:1.3;}
+.nav-instructor{font-size:0.62rem;color:var(--accent);font-weight:600;line-height:1.3;}
+.nav-links{display:flex;gap:4px;align-items:center;}
+.nav-link{padding:6px 14px;border-radius:7px;font-size:0.78rem;font-weight:600;color:var(--muted);text-decoration:none;cursor:pointer;border:1px solid var(--border);background:var(--s2);transition:all 0.2s;display:inline-flex;align-items:center;gap:5px;}
+.nav-link:hover{color:var(--text);border-color:var(--border2);}
+.nav-link.active{color:var(--text);border-color:var(--accent);background:rgba(249,195,58,0.08);}
+.nav-link.home-link{border-color:var(--border);}
+.nav-link.practical-link{border-color:rgba(0,255,247,0.3);color:#00fff7;}
+.nav-link.practical-link:hover{border-color:#00fff7;background:rgba(0,255,247,0.06);}
+.nav-divider{width:1px;height:18px;background:var(--border);margin:0 4px;}
 
 .wrap{max-width:780px;margin:0 auto;padding:32px 24px 100px;position:relative;z-index:1;}
 
@@ -289,23 +245,151 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .setup-notice code{background:rgba(249,195,58,0.1);padding:1px 6px;border-radius:4px;font-family:'Fira Code',monospace;font-size:0.82rem;}
 
 @media(max-width:600px){
-  .wrap{padding:20px 16px 80px;}
-  .nav{padding:0 16px;}
-  .result-grid{grid-template-columns:1fr 1fr;}
+  /* ── NAV — 2-row mobile layout ── */
+  .nav{
+    height:auto;padding:10px 12px 0;
+    flex-direction:column;align-items:stretch;gap:0;
+  }
+  .nav-logo{gap:8px;padding-bottom:8px;}
+  .nav-logo-icon{width:28px;height:28px;font-size:0.65rem;flex-shrink:0;}
+  .nav-title{font-size:0.76rem;}
+  .nav-sub,.nav-instructor{font-size:0.58rem;}
+  .nav-links{
+    display:flex;flex-direction:row;gap:4px;
+    border-top:1px solid var(--border);
+    padding:8px 0 9px;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .nav-links::-webkit-scrollbar{display:none;}
+  .nav-link{
+    padding:6px 10px;font-size:0.7rem;
+    white-space:nowrap;flex-shrink:0;
+  }
+  .nav-divider{display:none;}
+  #nav-user-badge{display:none !important;}
+
+  /* ── WRAP ── */
+  .wrap{padding:16px 12px 100px;}
+
+  /* ── GATE SCREEN ── */
+  #gate-screen{padding:28px 4px 20px;}
+  .gate-icon{font-size:2.8rem;margin-bottom:14px;}
+  .gate-title{font-size:1.55rem;margin-bottom:8px;}
+  .gate-desc{font-size:0.84rem;margin-bottom:24px;line-height:1.65;}
+  .gate-cards{gap:8px;margin-bottom:24px;}
+  .gate-card{padding:12px 14px;min-width:72px;border-radius:10px;}
+  .gc-val{font-size:1.3rem;}
+  .gc-lbl{font-size:0.62rem;}
+  .gate-form{padding:18px 16px;border-radius:12px;}
+  .gate-form-title{font-size:0.88rem;}
+  .form-input{font-size:0.88rem;padding:11px 12px;}
+  .form-label{font-size:0.72rem;}
+  .btn-start{
+    width:100%;padding:14px;font-size:0.95rem;
+    border-radius:12px;
+  }
+
+  /* ── ALREADY TAKEN ── */
+  .taken-card{padding:28px 16px 24px;border-radius:16px;}
+  .taken-icon{font-size:2.8rem;}
+  .taken-title{font-size:1.1rem;}
+  .taken-msg{font-size:0.82rem;}
+  .taken-detail{font-size:0.78rem;padding:12px 14px;}
+  .btn-taken-home{width:100%;padding:13px;font-size:0.85rem;}
+
+  /* ── QUIZ SCREEN ── */
+  .quiz-topbar{
+    flex-direction:column;align-items:flex-start;
+    gap:8px;margin-bottom:14px;
+  }
+  .q-info{font-size:0.72rem;}
+  .q-info strong{font-size:0.92rem;}
+  .timer-box{padding:8px 14px;border-radius:8px;width:100%;justify-content:space-between;}
+  #timer{font-size:1rem;}
+  .prog-bar-outer{margin-bottom:16px;}
+
+  /* Question card */
+  .q-card{padding:18px 14px 16px;border-radius:12px;margin-bottom:14px;}
+  .q-type-chip{font-size:0.58rem;padding:2px 8px;}
+  .q-text{font-size:0.92rem;margin-bottom:14px;line-height:1.5;}
+  .q-code{font-size:0.74rem;padding:10px 12px;border-radius:6px;}
+
+  /* Choices — bigger tap targets on mobile */
+  .choices{gap:8px;}
+  .choice{
+    padding:14px 12px;font-size:0.86rem;border-radius:10px;
+    min-height:52px;gap:10px;
+  }
+  .choice-ltr{width:28px;height:28px;font-size:0.7rem;border-radius:6px;flex-shrink:0;}
+
+  /* Feedback */
+  .feedback{font-size:0.82rem;padding:11px 13px;}
+
+  /* Footer */
+  .quiz-footer{
+    flex-direction:column-reverse;align-items:stretch;gap:8px;margin-top:14px;
+  }
+  .q-flag{text-align:center;font-size:0.74rem;}
+  .btn-next{
+    width:100%;padding:14px;font-size:0.92rem;
+    border-radius:10px;text-align:center;display:none;
+  }
+  .btn-next.show{display:block;}
+
+  /* ── RESULT SCREEN ── */
+  .result-header{padding:28px 16px 24px;border-radius:16px;}
+  .result-ring-wrap{width:130px;height:130px;margin-bottom:16px;}
+  .ring-score{font-size:1.7rem;}
+  .result-title{font-size:1.35rem;}
+  .result-msg{font-size:0.82rem;}
+  .result-grid{
+    grid-template-columns:1fr 1fr 1fr;gap:8px;margin:16px 0;
+  }
+  .rg-box{padding:12px 8px;border-radius:10px;}
+  .rg-val{font-size:1.25rem;}
+  .rg-lbl{font-size:0.62rem;}
+
+  /* Screenshot notice */
+  .screenshot-notice{padding:14px;border-radius:12px;}
+  .sn-title{font-size:0.7rem;}
+  .sn-step{font-size:0.78rem;}
+  .btn-download-png{font-size:0.84rem;padding:12px;}
+
+  /* Submit status */
+  .submit-status{padding:14px 14px;border-radius:10px;}
+  .ss-title{font-size:0.86rem;}
+  .ss-msg{font-size:0.74rem;}
+
+  /* Result buttons */
+  .result-btns{flex-direction:column;gap:8px;}
+  .btn-review{width:100%;padding:13px;font-size:0.86rem;border-radius:10px;}
+
+  /* Review */
+  .rv-item{padding:14px;border-radius:10px;}
+  .rv-q{font-size:0.84rem;}
+  .rv-yours,.rv-exp{font-size:0.78rem;}
+
+  /* Feedback panel */
+  .fb-panel-header{padding:16px;}
+  .fb-panel-title{font-size:1rem;}
+  .fb-panel-sub{font-size:0.78rem;}
+  .fb-form{padding:16px;gap:16px;}
+  .fb-star{font-size:1.65rem;}
+  .fb-chip{font-size:0.78rem;padding:6px 12px;}
+  .fb-textarea{font-size:0.84rem;min-height:88px;}
+  .fb-submit{width:100%;justify-content:center;padding:13px;}
+  .fb-thanks{padding:22px 16px;}
 }
 </style>
-
-<!-- Firebase Auth Guard + Gmail 1-Take Enforcement -->
+<!-- Firebase Auth Guard + Firestore 1-Take -->
 <script type="module">
-import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, GoogleAuthProvider, onAuthStateChanged, signOut }
-                            from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { initializeApp }   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut }
+                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp }
-                            from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-// ══════════════════════════════════════════
-//  🔧 PASTE YOUR FIREBASE CONFIG HERE
-// ══════════════════════════════════════════
 const firebaseConfig = {
   apiKey:            "AIzaSyBPXF8GpjJhNCkNzkkz-kkGVH2cx3XXBjs",
   authDomain:        "YOUR_PROJECT.firebaseapp.com",
@@ -314,71 +398,55 @@ const firebaseConfig = {
   messagingSenderId: "YOUR_SENDER_ID",
   appId:             "YOUR_APP_ID"
 };
-// ══════════════════════════════════════════
 
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
-
 window._quizDB = db;
 
 onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    // Not signed in → redirect to login
-    window.location.href = 'login.html';
-    return;
-  }
-
-  // Expose globally for quiz JS
+  if (!user) { window.location.href = 'login.html'; return; }
   window.firebaseUser  = user;
   window.firebaseUID   = user.uid;
   window.firebaseEmail = user.email;
 
-  // Show user badge in nav
   const badge = document.getElementById('nav-user-badge');
   if (badge) {
-    const photo = user.photoURL
-      ? `<img src="${user.photoURL}" style="width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:5px;border:1px solid rgba(58,249,195,0.4);">`
-      : '👤 ';
+    const photo = user.photoURL ? `<img src="${user.photoURL}" style="width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:5px;border:1px solid rgba(58,249,195,0.4);">` : '👤 ';
     badge.innerHTML = photo + (user.displayName || user.email);
     badge.style.display = 'inline-flex';
   }
-
-  // Pre-fill name from Google account
   const nameEl = document.getElementById('inp-name');
   if (nameEl && !nameEl.value && user.displayName) nameEl.value = user.displayName;
 
-  // ── 1-TAKE CHECK: Firestore (server-side, Gmail UID key) ──
   try {
     const snap = await getDoc(doc(db, 'quiz_submissions', user.uid));
     if (snap.exists()) {
       const d = snap.data();
       const detail = document.getElementById('taken-detail');
       if (detail) detail.innerHTML =
-        `<span>Gmail:</span> ${d.gmail || user.email}<br>
-         <span>Name:</span> ${d.name || '—'}<br>
-         <span>Student No:</span> ${d.studentNo || '—'}<br>
-         <span>Score:</span> ${d.score || '—'}<br>
-         <span>Percentage:</span> ${d.percent || '—'}<br>
-         <span>Submitted:</span> ${d.timestamp || '—'}`;
+        `<span>Gmail:</span> ${d.gmail||user.email}<br>
+         <span>Name:</span> ${d.name||'—'}<br>
+         <span>Student No:</span> ${d.studentNo||'—'}<br>
+         <span>Score:</span> ${d.score||'—'}<br>
+         <span>Percentage:</span> ${d.percent||'—'}<br>
+         <span>Submitted:</span> ${d.timestamp||'—'}`;
       document.getElementById('gate-screen').style.display  = 'none';
       document.getElementById('taken-screen').style.display = 'block';
       return;
     }
   } catch(e) {
-    // Firestore not configured yet — fall back to localStorage check
-    const localKey = 'quiz_done_uid_' + user.uid;
-    const cached   = localStorage.getItem(localKey);
+    const cached = localStorage.getItem('quiz_done_uid_' + user.uid);
     if (cached) {
       try {
         const d = JSON.parse(cached);
         const detail = document.getElementById('taken-detail');
         if (detail) detail.innerHTML =
-          `<span>Gmail:</span> ${d.gmail || user.email}<br>
-           <span>Name:</span> ${d.name || '—'}<br>
-           <span>Score:</span> ${d.score || '—'}<br>
-           <span>Percentage:</span> ${d.percent || '—'}<br>
-           <span>Submitted:</span> ${d.timestamp || '—'}`;
+          `<span>Gmail:</span> ${d.gmail||user.email}<br>
+           <span>Name:</span> ${d.name||'—'}<br>
+           <span>Score:</span> ${d.score||'—'}<br>
+           <span>Percentage:</span> ${d.percent||'—'}<br>
+           <span>Submitted:</span> ${d.timestamp||'—'}`;
         document.getElementById('gate-screen').style.display  = 'none';
         document.getElementById('taken-screen').style.display = 'block';
       } catch(e2) {}
@@ -386,29 +454,21 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// Called after quiz result is finalized — saves submission to Firestore
 window.saveQuizToFirestore = async function(score, pct, wrong, stuName, stuNo) {
   if (!window.firebaseUID) return;
   const record = {
-    uid:       window.firebaseUID,
-    gmail:     window.firebaseEmail,
-    name:      stuName || window.firebaseUser?.displayName || '',
+    uid: window.firebaseUID, gmail: window.firebaseEmail,
+    name: stuName || window.firebaseUser?.displayName || '',
     studentNo: stuNo || 'N/A',
-    score:     score + '/20',
-    percent:   pct + '%',
-    wrong:     wrong,
+    score: score + '/20', percent: pct + '%', wrong,
     timestamp: new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'}),
     submittedAt: serverTimestamp()
   };
-  // Save to localStorage (fast, immediate)
   localStorage.setItem('quiz_done_uid_' + window.firebaseUID, JSON.stringify(record));
-  // Save to Firestore (persistent, cross-device)
-  try {
-    await setDoc(doc(db, 'quiz_submissions', window.firebaseUID), record);
-  } catch(e) { console.warn('Firestore save error:', e); }
+  try { await setDoc(doc(db,'quiz_submissions',window.firebaseUID), record); }
+  catch(e) { console.warn('Firestore:', e); }
 };
 
-// Sign out
 window.firebaseSignOut = async function() {
   await signOut(auth);
   localStorage.removeItem('firebase_user');
@@ -430,15 +490,15 @@ window.firebaseSignOut = async function() {
   </div>
   <div class="nav-links">
     <a href="index.html" class="nav-link home-link">🏠 Home</a>
+    <div class="nav-divider"></div>
     <a href="lesson.html" class="nav-link">📘 Lesson</a>
     <a href="quiz.html" class="nav-link active">📝 Quiz</a>
     <a href="practical.html" class="nav-link practical-link">💻 Practical</a>
+    <a href="profile.html" class="nav-link" style="border-color:rgba(168,85,247,0.3);color:#a855f7;">👤 Profile</a>
     <div class="nav-divider"></div>
-    <span id="nav-user-badge" onclick="window.firebaseSignOut&&window.firebaseSignOut()" title="Click to sign out"
-      style="display:none;align-items:center;gap:4px;font-size:0.7rem;color:var(--accent2);
-      cursor:pointer;padding:4px 9px;border:1px solid rgba(58,249,195,0.25);
-      border-radius:7px;background:rgba(58,249,195,0.05);max-width:150px;
-      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+    <span id="nav-user-badge" onclick="window.firebaseSignOut&&window.firebaseSignOut()" title="Sign out"
+      style="display:none;align-items:center;gap:5px;font-size:0.72rem;color:var(--accent2);cursor:pointer;padding:4px 10px;border:1px solid rgba(58,249,195,0.25);border-radius:7px;background:rgba(58,249,195,0.05);">
+    </span>
   </div>
 </nav>
 
@@ -499,7 +559,7 @@ window.firebaseSignOut = async function() {
         <label class="form-label">SECTION *</label>
         <input class="form-input" id="inp-section" type="text" placeholder="e.g. CE-1A" maxlength="20">
       </div>
-  
+
     </div>
 
     <button class="btn-start" onclick="startQuiz()">Begin Assessment →</button>
@@ -870,24 +930,28 @@ function showResults(){
 
   submitToSheets(score, pct, wrong);
 
-  // ── LOCK: save to Firestore by Firebase UID (Gmail-based 1-take) ──
+  // ── SAVE to Firestore (Gmail UID) ──
   if (typeof window.saveQuizToFirestore === 'function') {
     window.saveQuizToFirestore(score, pct, wrong, stuName, stuNo);
   }
+  // localStorage lock
+  const _record = JSON.stringify({ gmail: window.firebaseEmail||'N/A', name:stuName, studentNo:stuNo||'N/A', score:score+'/20', percent:pct+'%', timestamp:new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'}) });
+  if(stuNo)   localStorage.setItem('quiz_done_no_'+(stuNo||'').toLowerCase().replace(/\s/g,''), _record);
+  if(stuName) localStorage.setItem('quiz_done_name_'+stuName.toLowerCase().replace(/\s/g,''), _record);
 
-  // ── LOCK: localStorage backup (student number + name + UID) ──
+  // ── LOCK: save record so this student can't retake ──
   const record = JSON.stringify({
     name:      stuName,
     studentNo: stuNo || 'N/A',
     section:   stuSection,
     score:     score + '/20',
     percent:   pct + '%',
-    gmail:     window.firebaseEmail || 'N/A',
     timestamp: new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'})
   });
-  if(stuNo)                 localStorage.setItem('quiz_done_no_'   + (stuNo||'').toLowerCase().replace(/\s/g,''), record);
-  if(stuName)               localStorage.setItem('quiz_done_name_' + stuName.toLowerCase().replace(/\s/g,''), record);
-  if(window.firebaseUID)    localStorage.setItem('quiz_done_uid_'  + window.firebaseUID, record);
+  const keyNo   = 'quiz_done_no_'   + (stuNo||'').toLowerCase().replace(/\s/g,'');
+  const keyName = 'quiz_done_name_' + stuName.toLowerCase().replace(/\s/g,'');
+  if(stuNo)   localStorage.setItem(keyNo,   record);
+  if(stuName) localStorage.setItem(keyName, record);
 
   // Auto-show feedback panel after a short delay
   setTimeout(()=>{
