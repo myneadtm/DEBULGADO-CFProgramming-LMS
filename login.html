@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Sign In — Computer Fundamentals and Programming</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060b14;--s1:#0b1120;--s2:#101828;--s3:#1a2436;
+  --border:#1e2d42;--border2:#273648;
+  --accent:#f9c33a;--green:#3af9c3;--red:#f93a7a;
+  --purple:#a855f7;--cyan:#22d3ee;--blue:#3b82f6;
+  --text:#e2eeff;--muted:#5a7499;--dim:#3a4f6a;
+  --font:'Outfit',sans-serif;--mono:'Fira Code',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100dvh;}
+body{
+  font-family:var(--font);background:var(--bg);color:var(--text);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px 16px;overflow-x:hidden;
+}
+
+/* BG */
+.bg-grid{position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(59,130,246,0.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(59,130,246,0.035) 1px,transparent 1px);
+  background-size:48px 48px;}
+.bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 50% at 20% 10%,rgba(168,85,247,0.1),transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 90%,rgba(34,211,238,0.07),transparent 60%);}
+
+/* TOP BAR */
+#top-bar{position:fixed;top:0;left:0;height:3px;width:0;z-index:9999;
+  background:linear-gradient(90deg,var(--purple),var(--cyan),var(--accent));
+  transition:width 0.5s ease;box-shadow:0 0 12px rgba(168,85,247,0.7);}
+
+/* WRAP */
+.wrap{position:relative;z-index:1;width:100%;max-width:460px;}
+
+/* BRAND */
+.brand{text-align:center;margin-bottom:24px;}
+.brand-icon{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:54px;height:54px;border-radius:14px;margin-bottom:14px;
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  font-family:var(--mono);font-weight:600;font-size:0.82rem;color:#fff;
+  box-shadow:0 8px 24px rgba(168,85,247,0.4);
+  animation:float 4s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+.brand-school{font-size:0.6rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;}
+.brand-name{font-size:1rem;font-weight:800;}
+.brand-badge{
+  display:inline-flex;align-items:center;gap:6px;margin-top:10px;
+  background:rgba(249,195,58,0.07);border:1px solid rgba(249,195,58,0.2);
+  color:var(--accent);font-size:0.62rem;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:20px;
+}
+.bdot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.1;}}
+
+/* CARD */
+.card{
+  background:var(--s1);border:1.5px solid var(--border2);
+  border-radius:22px;padding:36px 32px 32px;
+  box-shadow:0 24px 80px rgba(0,0,0,0.55);
+  position:relative;overflow:hidden;
+  animation:slideUp 0.4s cubic-bezier(.4,0,.2,1) both;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--purple),var(--cyan),var(--accent));}
+
+/* MASCOT */
+.mascot{
+  display:flex;align-items:center;gap:14px;
+  background:rgba(168,85,247,0.05);border:1px solid rgba(168,85,247,0.12);
+  border-radius:14px;padding:14px 16px;margin-bottom:28px;
+}
+.mascot img{width:58px;height:auto;border-radius:12px;
+  border:1.5px solid rgba(168,85,247,0.35);
+  box-shadow:0 0 20px rgba(168,85,247,0.2);flex-shrink:0;}
+.mascot-name{font-size:0.92rem;font-weight:800;color:var(--cyan);}
+.mascot-sub{font-size:0.68rem;color:var(--muted);line-height:1.5;margin-top:2px;}
+
+/* TITLE */
+.card-title{font-size:1.35rem;font-weight:800;margin-bottom:6px;}
+.card-title span{background:linear-gradient(90deg,var(--purple),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.card-sub{font-size:0.8rem;color:var(--muted);line-height:1.7;margin-bottom:28px;}
+
+/* INFO PILLS */
+.info-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;}
+.pill{
+  display:flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--muted);
+  background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;
+}
+.pill strong{color:var(--text);}
+
+/* GOOGLE BUTTON */
+.btn-google{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:12px;
+  background:#ffffff;color:#1f2937;border:none;border-radius:12px;
+  padding:15px 20px;font-family:var(--font);font-weight:700;font-size:0.95rem;
+  cursor:pointer;transition:all 0.2s;
+  box-shadow:0 4px 16px rgba(0,0,0,0.35);margin-bottom:14px;
+}
+.btn-google:hover{background:#f5f5f5;box-shadow:0 6px 24px rgba(0,0,0,0.45);transform:translateY(-2px);}
+.btn-google:active{transform:scale(0.98);}
+.btn-google:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.g-icon{width:22px;height:22px;flex-shrink:0;}
+
+/* USER CARD */
+.user-card{
+  display:none;align-items:center;gap:12px;
+  background:rgba(58,249,195,0.05);border:1px solid rgba(58,249,195,0.2);
+  border-radius:12px;padding:14px 16px;margin-bottom:14px;
+}
+.user-card.show{display:flex;}
+.user-avatar{width:42px;height:42px;border-radius:50%;
+  border:2px solid var(--green);flex-shrink:0;}
+.user-info{}
+.user-name{font-weight:700;font-size:0.92rem;}
+.user-email{font-size:0.74rem;color:var(--muted);margin-top:1px;}
+.user-tag{display:inline-block;font-size:0.6rem;font-weight:700;
+  background:rgba(58,249,195,0.12);color:var(--green);
+  border:1px solid rgba(58,249,195,0.25);padding:2px 8px;border-radius:10px;margin-top:3px;}
+
+/* CONTINUE BUTTON */
+.btn-continue{
+  width:100%;display:none;
+  background:linear-gradient(135deg,var(--purple),var(--cyan));
+  color:#fff;border:none;border-radius:12px;padding:14px;
+  font-family:var(--font);font-weight:800;font-size:0.95rem;
+  cursor:pointer;transition:all 0.2s;
+  box-shadow:0 4px 20px rgba(168,85,247,0.35);margin-bottom:12px;
+}
+.btn-continue.show{display:block;}
+.btn-continue:hover{box-shadow:0 6px 28px rgba(168,85,247,0.55);transform:translateY(-2px);}
+
+/* SIGNOUT LINK */
+.signout-link{display:none;font-size:0.74rem;color:var(--muted);
+  cursor:pointer;text-align:center;text-decoration:underline;}
+.signout-link:hover{color:var(--red);}
+.signout-link.show{display:block;}
+
+/* NOTICE */
+.notice{
+  background:rgba(249,195,58,0.05);border:1px solid rgba(249,195,58,0.15);
+  border-radius:10px;padding:12px 14px;margin-top:20px;
+  font-size:0.75rem;color:var(--muted);line-height:1.7;
+}
+.notice strong{color:var(--accent);}
+
+/* ERROR */
+.err-box{
+  display:none;background:rgba(249,58,122,0.07);border:1px solid rgba(249,58,122,0.2);
+  border-radius:10px;padding:12px 14px;margin-bottom:14px;
+  font-size:0.8rem;color:#ffa8c0;line-height:1.5;text-align:center;
+}
+.err-box.show{display:block;}
+
+/* LOADING SPINNER */
+.spin{display:inline-block;animation:spin 0.85s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+@media(max-width:480px){
+  .card{padding:24px 16px 20px;}
+  .mascot img{width:46px;}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div id="top-bar"></div>
+
+<div class="wrap">
+
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand-icon">C++</div>
+    <div class="brand-name">Computer Fundamentals and Programming</div>
+    <div class="brand-badge"><span class="bdot"></span>2nd Semester · AY 2025-2026</div>
+  </div>
+
+  <!-- Card -->
+  <div class="card">
+
+    <!-- Mascot -->
+    <div class="mascot">
+      <img src="teacher-d.png" alt="Teacher D">
+      <div>
+        <div class="mascot-name">Teacher D!</div>
+        <div class="mascot-sub">INSTRUCTOR: DEBULGADO, S.M.G<br>Sign in with your Gmail to access the course.</div>
+      </div>
+    </div>
+
+    <div class="card-title">Sign In with <span>Gmail</span></div>
+    <p class="card-sub">Use your personal Gmail account to log in. Your Gmail is tied to your quiz and practical submissions — one account, one submission.</p>
+
+    <div class="info-pills">
+      <div class="pill">🔒 <strong>1 Gmail</strong> = 1 quiz submission</div>
+      <div class="pill">💻 <strong>1 Gmail</strong> = 1 practical submission</div>
+      <div class="pill">📊 Auto-recorded scores</div>
+    </div>
+
+    <!-- Error box -->
+    <div class="err-box" id="err-box"></div>
+
+    <!-- User card (after sign in) -->
+    <div class="user-card" id="user-card">
+      <img class="user-avatar" id="user-avatar" src="" alt="">
+      <div class="user-info">
+        <div class="user-name" id="user-name"></div>
+        <div class="user-email" id="user-email"></div>
+        <span class="user-tag">✅ Signed In with Gmail</span>
+      </div>
+    </div>
+
+    <!-- Google Sign-In button -->
+    <button class="btn-google" id="btn-google" onclick="signInGoogle()">
+      <svg class="g-icon" viewBox="0 0 24 24">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      <span id="btn-text">Sign in with Google</span>
+    </button>
+
+    <!-- Continue button -->
+    <button class="btn-continue" id="btn-continue" onclick="goToHome()">
+      ▶ Continue to Site
+    </button>
+
+    <!-- Sign out link -->
+    <div class="signout-link" id="signout-link" onclick="doSignOut()">
+      Sign out / Use different account
+    </div>
+
+    <div class="notice">
+      ⚠️ <strong>Important:</strong> Each Gmail account can only submit the quiz and practical <strong>once</strong>. Make sure you are signing in with your own account. Your Gmail will be recorded alongside your scores.
+    </div>
+
+  </div><!-- end card -->
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup,
+         signOut, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+// ══════════════════════════════════════════
+//  🔧 PASTE YOUR FIREBASE CONFIG HERE
+// ══════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyBPXF8GpjJhNCkNzkkz-kkGVH2cx3XXBjs",
+  authDomain: "cfp2526-database.firebaseapp.com",
+  projectId: "cfp2526-database",
+  storageBucket: "cfp2526-database.firebasestorage.app",
+  messagingSenderId: "111042690196",
+  appId: "1:111042690196:web:cd63203bd29b350cea8881",
+  measurementId: "G-Y7CMBZM1G1"
+};
+// ══════════════════════════════════════════
+
+const app      = initializeApp(firebaseConfig);
+const auth     = getAuth(app);
+const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt: 'select_account' });
+
+let currentUser = null;
+
+// Watch auth state
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
+    showUserCard(user);
+  } else {
+    currentUser = null;
+    hideUserCard();
+  }
+});
+
+function showUserCard(user) {
+  document.getElementById('user-card').classList.add('show');
+  document.getElementById('user-avatar').src  = user.photoURL || '';
+  document.getElementById('user-name').textContent  = user.displayName || 'Student';
+  document.getElementById('user-email').textContent = user.email;
+  document.getElementById('btn-google').style.display   = 'none';
+  document.getElementById('btn-continue').classList.add('show');
+  document.getElementById('signout-link').classList.add('show');
+
+  // Save to localStorage so other pages can read it
+  localStorage.setItem('firebase_user', JSON.stringify({
+    uid:   user.uid,
+    email: user.email,
+    name:  user.displayName || '',
+    photo: user.photoURL    || ''
+  }));
+  localStorage.setItem('student_session', JSON.stringify({
+    loggedIn:  true,
+    email:     user.email,
+    name:      user.displayName || '',
+    uid:       user.uid,
+    timestamp: new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'})
+  }));
+}
+
+function hideUserCard() {
+  document.getElementById('user-card').classList.remove('show');
+  document.getElementById('btn-google').style.display   = 'flex';
+  document.getElementById('btn-continue').classList.remove('show');
+  document.getElementById('signout-link').classList.remove('show');
+  localStorage.removeItem('firebase_user');
+  localStorage.removeItem('student_session');
+}
+
+window.signInGoogle = async function() {
+  const btn  = document.getElementById('btn-google');
+  const err  = document.getElementById('err-box');
+  btn.disabled = true;
+  document.getElementById('btn-text').innerHTML = '<span class="spin">⟳</span> Signing in...';
+  err.className = 'err-box';
+
+  setBar(30);
+  try {
+    await signInWithPopup(auth, provider);
+    setBar(100);
+  } catch(e) {
+    setBar(0);
+    btn.disabled = false;
+    document.getElementById('btn-text').textContent = 'Sign in with Google';
+    if (e.code !== 'auth/popup-closed-by-user') {
+      err.textContent = '❌ Sign-in failed: ' + (e.message || 'Please try again.');
+      err.className = 'err-box show';
+    }
+  }
+};
+
+window.doSignOut = async function() {
+  await signOut(auth);
+};
+
+window.goToHome = function() {
+  if (currentUser) window.location.href = 'index.html';
+};
+
+function setBar(pct){
+  const bar = document.getElementById('top-bar');
+  bar.style.width   = pct + '%';
+  bar.style.opacity = '1';
+  if (pct >= 100) setTimeout(()=>{ bar.style.opacity = '0'; }, 600);
+}
+</script>
+</body>
+</html>
