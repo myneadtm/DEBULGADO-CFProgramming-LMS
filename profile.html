@@ -224,6 +224,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(6,11,20,0.94);
     <span id="nav-userbadge" class="nav-userbadge"
       onclick="window._signOut&&window._signOut()"
       title="Click to sign out"></span>
+    <div class="nav-divider"></div>
+    <span id="nav-user-badge" onclick="window.firebaseSignOut&&window.firebaseSignOut()" title="Sign out"
+      style="display:none;align-items:center;gap:5px;font-size:0.72rem;color:var(--accent2);cursor:pointer;padding:4px 10px;border:1px solid rgba(58,249,195,0.25);border-radius:7px;background:rgba(58,249,195,0.05);">
+    </span>
   </div>
 </nav>
 
