@@ -334,89 +334,72 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 }
 </style>
 
-<!-- Firebase Auth Guard + Gmail 1-Take Enforcement -->
+<!-- Firebase Auth Guard + Firestore 1-Take -->
 <script type="module">
-import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { initializeApp }   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signOut }
-                            from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp }
-                            from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-// ══════════════════════════════════════════
-//  🔧 PASTE YOUR FIREBASE CONFIG HERE
-// ══════════════════════════════════════════
 const firebaseConfig = {
-  apiKey: "AIzaSyBPXF8GpjJhNCkNzkkz-kkGVH2cx3XXBjs",
-  authDomain: "cfp2526-database.firebaseapp.com",
-  projectId: "cfp2526-database",
-  storageBucket: "cfp2526-database.firebasestorage.app",
-  messagingSenderId: "111042690196",
-  appId: "1:111042690196:web:cd63203bd29b350cea8881",
-  measurementId: "G-Y7CMBZM1G1"
+  apiKey:            "AIzaSyBPXF8GpjJhNCkNzkkz-kkGVH2cx3XXBjs",
+  authDomain:        "YOUR_PROJECT.firebaseapp.com",
+  projectId:         "YOUR_PROJECT_ID",
+  storageBucket:     "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID"
 };
-// ══════════════════════════════════════════
 
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
-
 window._pracDB = db;
 
 onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = 'login.html';
-    return;
-  }
-
+  if (!user) { window.location.href = 'login.html'; return; }
   window.firebaseUser  = user;
   window.firebaseUID   = user.uid;
   window.firebaseEmail = user.email;
 
-  // Show user badge in nav
   const badge = document.getElementById('nav-user-badge');
   if (badge) {
-    const photo = user.photoURL
-      ? `<img src="${user.photoURL}" style="width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:5px;border:1px solid rgba(0,255,247,0.4);">`
-      : '👤 ';
+    const photo = user.photoURL ? `<img src="${user.photoURL}" style="width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:5px;border:1px solid rgba(0,255,247,0.4);">` : '👤 ';
     badge.innerHTML = photo + (user.displayName || user.email);
     badge.style.display = 'inline-flex';
   }
-
-  // Pre-fill name from Google account
   const nameEl = document.getElementById('inp-name');
   if (nameEl && !nameEl.value && user.displayName) nameEl.value = user.displayName;
 
-  // ── 1-TAKE CHECK: Firestore (server-side, Gmail UID key) ──
+  // 1-TAKE CHECK via Firestore
   try {
     const snap = await getDoc(doc(db, 'practical_submissions', user.uid));
     if (snap.exists()) {
       const d = snap.data();
       const detail = document.getElementById('taken-detail');
       if (detail) detail.innerHTML =
-        `<span>Gmail:</span> ${d.gmail || user.email}<br>
-         <span>Name:</span> ${d.name || '—'}<br>
-         <span>Student No:</span> ${d.studentNo || '—'}<br>
-         <span>Score:</span> ${d.percent || '—'}<br>
-         <span>Time Taken:</span> ${d.timeTaken || '—'}<br>
-         <span>Submitted:</span> ${d.timestamp || '—'}`;
+        `<span>Gmail:</span> ${d.gmail||user.email}<br>
+         <span>Name:</span> ${d.name||'—'}<br>
+         <span>Student No:</span> ${d.studentNo||'—'}<br>
+         <span>Score:</span> ${d.percent||'—'}<br>
+         <span>Time Taken:</span> ${d.timeTaken||'—'}<br>
+         <span>Submitted:</span> ${d.timestamp||'—'}`;
       document.getElementById('gate-screen').style.display  = 'none';
       document.getElementById('taken-screen').style.display = 'block';
       return;
     }
   } catch(e) {
-    // Firestore not configured yet — fall back to localStorage
-    const localKey = 'practical_done_uid_' + user.uid;
-    const cached   = localStorage.getItem(localKey);
+    const cached = localStorage.getItem('practical_done_uid_' + user.uid);
     if (cached) {
       try {
         const d = JSON.parse(cached);
         const detail = document.getElementById('taken-detail');
         if (detail) detail.innerHTML =
-          `<span>Gmail:</span> ${d.gmail || user.email}<br>
-           <span>Name:</span> ${d.name || '—'}<br>
-           <span>Score:</span> ${d.percent || '—'}<br>
-           <span>Time Taken:</span> ${d.timeTaken || '—'}<br>
-           <span>Submitted:</span> ${d.timestamp || '—'}`;
+          `<span>Gmail:</span> ${d.gmail||user.email}<br>
+           <span>Name:</span> ${d.name||'—'}<br>
+           <span>Score:</span> ${d.percent||'—'}<br>
+           <span>Time Taken:</span> ${d.timeTaken||'—'}<br>
+           <span>Submitted:</span> ${d.timestamp||'—'}`;
         document.getElementById('gate-screen').style.display  = 'none';
         document.getElementById('taken-screen').style.display = 'block';
       } catch(e2) {}
@@ -424,26 +407,19 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// Save practical submission to Firestore
 window.savePracticalToFirestore = async function(passed, pct, timeStr, name, stuNo) {
   if (!window.firebaseUID) return;
   const record = {
-    uid:         window.firebaseUID,
-    gmail:       window.firebaseEmail,
-    name:        name || window.firebaseUser?.displayName || '',
-    studentNo:   stuNo || 'N/A',
-    score:       passed + '/2',
-    percent:     pct + '%',
-    timeTaken:   timeStr,
-    timestamp:   new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'}),
+    uid: window.firebaseUID, gmail: window.firebaseEmail,
+    name: name || window.firebaseUser?.displayName || '',
+    studentNo: stuNo || 'N/A',
+    score: passed + '/2', percent: pct + '%', timeTaken: timeStr,
+    timestamp: new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'}),
     submittedAt: serverTimestamp()
   };
-  // Save to localStorage (fast, immediate)
   localStorage.setItem('practical_done_uid_' + window.firebaseUID, JSON.stringify(record));
-  // Save to Firestore (persistent, cross-device)
-  try {
-    await setDoc(doc(db, 'practical_submissions', window.firebaseUID), record);
-  } catch(e) { console.warn('Firestore save error:', e); }
+  try { await setDoc(doc(db,'practical_submissions',window.firebaseUID), record); }
+  catch(e) { console.warn('Firestore:', e); }
 };
 
 window.firebaseSignOut = async function() {
@@ -482,6 +458,11 @@ window.firebaseSignOut = async function() {
     <a href="lesson.html" class="nav-link">📘 Lesson</a>
     <a href="quiz.html" class="nav-link">📝 Quiz 1</a>
     <a href="practical.html" class="nav-link active">💻 Practical</a>
+    <a href="profile.html" class="nav-link" style="border-color:rgba(168,85,247,0.3);color:#a855f7;">👤 Profile</a>
+    <div class="nav-divider"></div>
+    <span id="nav-user-badge" onclick="window.firebaseSignOut&&window.firebaseSignOut()" title="Sign out"
+      style="display:none;align-items:center;gap:5px;font-size:0.72rem;color:var(--accent2);cursor:pointer;padding:4px 10px;border:1px solid rgba(58,249,195,0.25);border-radius:7px;background:rgba(58,249,195,0.05);">
+    </span>
   </div>
 </nav>
 
@@ -1011,7 +992,7 @@ function showResults(isAuto){
 
   submitToSheets(passed, pct, timeStr, isAuto || false);
 
-  // ── LOCK: save to Firestore (Gmail UID key — strongest) ──
+  // ── SAVE to Firestore (Gmail UID — 1-take + dashboard) ──
   if (typeof window.savePracticalToFirestore === 'function') {
     window.savePracticalToFirestore(passed, pct, timeStr, stuName, stuNo);
   }
@@ -1020,8 +1001,8 @@ function showResults(isAuto){
   const key = 'practical_done_' + (stuNo||'unknown').toLowerCase().replace(/\s/g,'');
   const record = {
     studentNo: stuNo || 'N/A',
-    name:      stuName,
     gmail:     window.firebaseEmail || 'N/A',
+    name:      stuName,
     section:   stuSection,
     percent:   pct + '%',
     timeTaken: timeStr,
