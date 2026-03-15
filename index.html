@@ -486,13 +486,13 @@ footer{
   .hero-profile-ring{width:150px;height:200px;}
 }
 </style>
-<!-- Login Guard: redirect to login.html if not logged in -->
+<!-- Login Guard -->
 <script>
 (function(){
   try{
-    var s = JSON.parse(localStorage.getItem('student_session')||'{}');
+    var s=JSON.parse(localStorage.getItem('student_session')||'{}');
     if(!s.loggedIn) window.location.replace('login.html');
-  } catch(e){ window.location.replace('login.html'); }
+  }catch(e){ window.location.replace('login.html'); }
 })();
 </script>
 </head>
@@ -514,26 +514,9 @@ footer{
     <a href="lesson.html" class="nav-link lesson-link">📘 Lesson</a>
     <a href="quiz.html" class="nav-link quiz-link">📝 Quiz →</a>
     <a href="practical.html" class="nav-link practical-link">💻 Practical</a>
-    <div class="nav-divider"></div>
-    <span id="nav-student" style="font-size:0.7rem;color:var(--accent2);padding:4px 8px;border:1px solid rgba(58,249,195,0.2);border-radius:7px;background:rgba(58,249,195,0.04);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-    <button onclick="logoutStudent()" style="font-size:0.68rem;padding:5px 10px;border:1px solid rgba(249,58,122,0.3);border-radius:7px;background:rgba(249,58,122,0.06);color:#f93a7a;cursor:pointer;font-family:var(--font);font-weight:600;transition:all 0.2s;" onmouseover="this.style.background='rgba(249,58,122,0.14)'" onmouseout="this.style.background='rgba(249,58,122,0.06)'">⏻ Logout</button>
+    <a href="profile.html" class="nav-link" style="border-color:rgba(168,85,247,0.3);color:#a855f7;">👤 Profile</a>
   </div>
 </nav>
-<script>
-// Show logged-in student name in nav
-(function(){
-  try{
-    var s = JSON.parse(localStorage.getItem('student_session')||'{}');
-    if(s.surname) document.getElementById('nav-student').textContent = '👤 '+s.surname+', '+s.firstname;
-  }catch(e){}
-})();
-function logoutStudent(){
-  if(confirm('Are you sure you want to log out?')){
-    localStorage.removeItem('student_session');
-    window.location.href='login.html';
-  }
-}
-</script>
 
 <!-- HERO -->
 <section class="hero">
