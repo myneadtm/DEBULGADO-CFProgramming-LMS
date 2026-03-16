@@ -1216,30 +1216,56 @@ function selectChip(el,group){
 function toggleChip(el){ el.classList.toggle('selected'); }
 
 function submitFeedback(){
-  const diff=document.querySelector('.fb-chip.selected[onclick*="diff"]');
-  const pace=document.querySelector('.fb-chip.selected[onclick*="pace"]');
-  const conf=document.querySelector('.fb-chip.selected[onclick*="conf"]');
-  const ready=document.querySelector('.fb-chip.selected[onclick*="ready"]');
-  const helpful=[...document.querySelectorAll('.fb-chip.multi.selected')].map(c=>c.textContent.trim());
-  const comment=document.getElementById('fb-comment').value.trim();
+  const diff    = document.querySelector('.fb-chip.selected[onclick*="diff"]');
+  const pace    = document.querySelector('.fb-chip.selected[onclick*="pace"]');
+  const conf    = document.querySelector('.fb-chip.selected[onclick*="conf"]');
+  const ready   = document.querySelector('.fb-chip.selected[onclick*="ready"]');
+  const helpful = [...document.querySelectorAll('.fb-chip.multi.selected')].map(c=>c.textContent.trim());
+  const comment = document.getElementById('fb-comment').value.trim();
 
-  const fbData={
-    timestamp:new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'}),
-    student:stuName,
-    section:stuSection,
-    score:score+'/20',
-    starRating:starRating?starLabels[starRating]:'Not rated',
-    difficulty:diff?diff.textContent.trim():'Not answered',
-    pace:pace?pace.textContent.trim():'Not answered',
-    helpful:helpful.join(', ')||'None selected',
-    confusingTopic:conf?conf.textContent.trim():'Not answered',
-    readiness:ready?ready.textContent.trim():'Not answered',
-    comment:comment||'(none)'
+  const fbData = {
+    type:           'FEEDBACK',
+    timestamp:      new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'}),
+    student:        stuName        || (window.firebaseUser?.displayName) || 'Anonymous',
+    gmail:          window.firebaseEmail || 'N/A',
+    section:        stuSection     || 'N/A',
+    studentNo:      stuNo          || 'N/A',
+    score:          score + '/20',
+    starRating:     starRating ? starLabels[starRating] : 'Not rated',
+    difficulty:     diff  ? diff.textContent.trim()  : 'Not answered',
+    pace:           pace  ? pace.textContent.trim()  : 'Not answered',
+    helpful:        helpful.join(', ') || 'None selected',
+    confusingTopic: conf  ? conf.textContent.trim()  : 'Not answered',
+    readiness:      ready ? ready.textContent.trim() : 'Not answered',
+    comment:        comment || '(none)'
   };
 
-  localStorage.setItem('last_feedback',JSON.stringify(fbData));
-  document.getElementById('fb-form').style.display='none';
-  document.getElementById('fb-thanks').style.display='block';
+  // Save locally
+  localStorage.setItem('last_feedback', JSON.stringify(fbData));
+
+  // ── SEND TO GOOGLE SHEETS → "stdfeedback_cfp" sheet ──
+  if (SHEET_URL && !SHEET_URL.includes('YOUR_GOOGLE')) {
+    fetch(SHEET_URL, {
+      method: 'POST',
+      mode:   'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body:    JSON.stringify(fbData)
+    }).catch(()=>{});
+  }
+
+  // ── SAVE TO FIRESTORE ──
+  if (window.firebaseUID && window._quizDB) {
+    import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
+      .then(({ doc, setDoc, serverTimestamp }) => {
+        setDoc(
+          doc(window._quizDB, 'quiz_feedback', window.firebaseUID),
+          { ...fbData, submittedAt: serverTimestamp() }
+        ).catch(()=>{});
+      });
+  }
+
+  document.getElementById('fb-form').style.display = 'none';
+  document.getElementById('fb-thanks').style.display = 'block';
   document.getElementById('fb-thanks').scrollIntoView({behavior:'smooth'});
 }
 
