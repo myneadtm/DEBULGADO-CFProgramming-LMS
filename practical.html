@@ -907,7 +907,7 @@ function showStatus(taskId, success, message) {
   el.classList.add("show");
   el.classList.remove("pass", "try-again");
 
-if (passed === 2) {
+/* if (passed === 2) {
   resMsg = "Perfect! All tasks correct.";
 
 } else if (passed === 1) {
@@ -915,8 +915,8 @@ if (passed === 2) {
 } else {
   resMsg = "No correct tasks. Practice more.";
 }
-
-        /* if (success) {
+*/
+     if (success) {
     el.classList.add("pass");
     icon.textContent = "✅";
   } else {
@@ -926,16 +926,16 @@ if (passed === 2) {
 
   msg.textContent = message;
 }
-*/
+
 
   // FINAL SCORING ---
-/*  function calculateScore() {
+  function calculateScore() {
   const passed = taskResults.filter(t => t.passed).length;
   const total = TASKS.length;
   const percent = Math.round((passed / total) * 100);
 
   return { passed, total, percent };
-} */
+} 
   const { passed, total, percent } = calculateScore();
 
 // Update UI
