@@ -825,8 +825,69 @@ function updateTimerDisplay(){
 }
 
 // ── RUN TASK ──
-function runTask(id){
-  const code=document.getElementById('code-'+id).value;
+function runTask(taskId) {
+  const textarea = document.getElementById(`code-${taskId}`);
+  const outputPanel = document.getElementById(`output-${taskId}`);
+  const status = document.getElementById(`status-${taskId}`);
+
+  const code = textarea.value;
+
+  outputPanel.classList.remove("error");
+  outputPanel.classList.remove("idle");
+
+  try {
+    // Basic validation
+    if (!code.includes("#include")) {
+      throw "Missing #include <iostream>";
+    }
+    if (!code.includes("main")) {
+      throw "Missing main() function";
+    }
+
+    let output = "";
+
+    // Simulated execution logic
+    if (taskId === 1) {
+      const matches = code.match(/cout\s*<<\s*"([^"]+)"/g);
+
+      if (!matches || matches.length < 2) {
+        throw "You must print at least 2 lines using cout.";
+      }
+
+      output = matches
+        .map(line => line.match(/"([^"]+)"/)[1])
+        .join("\n");
+    }
+
+    if (taskId === 2) {
+      if (!code.includes("a + b") || !code.includes("a * b")) {
+        throw "Missing correct operations (a + b or a * b)";
+      }
+
+      output = "Sum: 15\nProduct: 50";
+    }
+
+    outputPanel.textContent = output;
+
+    const passed = checkTask(taskId, output);
+
+    updateTaskResult(taskId, passed);
+
+    if (passed) {
+      showStatus(taskId, true, "✅ Correct!");
+    } else {
+      showStatus(taskId, false, "⚠️ Output mismatch.");
+    }
+
+  } catch (err) {
+    outputPanel.textContent = "Error: " + err;
+    outputPanel.classList.add("error");
+    showStatus(taskId, false, "❌ Compilation Error");
+  }
+}
+  
+/* function runTask(id){
+  const code=document.getElementById('code-'+id).value; 
   const out=document.getElementById('output-'+id);
   const st=document.getElementById('status-'+id);
   const btn=document.getElementById('task-card-'+id).querySelector('.btn-run');
@@ -903,6 +964,10 @@ function updateProgress(){
   const passed=Object.values(taskResults).filter(r=>r&&r.pass).length;
   document.getElementById('prog-inner').style.width=(passed/2*100)+'%';
 }
+
+*/
+
+  
 
 // ── SIMULATE C++ ──
 function simulateCpp(code){
