@@ -608,7 +608,8 @@ window.firebaseSignOut = async function() {
 
     <div class="result-hero">
       <div class="result-glow"></div>
-      <div class="result-score-big" id="res-score">0/5</div>
+      <!-- <div class="result-score-big" id="res-score">0/5</div> -->
+      <div class="result-score-big" id="res-score">0/2</div>
       <div class="result-label">Tasks Completed (out of 2)</div>
       <h2 class="result-title" id="res-title">Session Complete</h2>
       <p class="result-msg" id="res-msg"></p>
@@ -709,8 +710,12 @@ int main() {
 
 let stuName='', stuNo='', stuSection='', startTime=null;
 let sessionTimer=null, sessionSeconds=3600;
-let taskResults=[];
-let submitted=false;
+/*let taskResults=[];
+let submitted=false; */
+  let taskResults = [
+  { id: 1, passed: false },
+  { id: 2, passed: false }
+];
 
 // ── START SESSION ──
 function startSession(){
@@ -848,7 +853,8 @@ function runTask(taskId) {
 
     // Simulated execution logic
     if (taskId === 1) {
-      const matches = code.match(/cout\s*<<\s*"([^"]+)"/g);
+     // const matches = code.match(/cout\s*<<\s*"([^"]+)"/g);
+      const matches = code.match(/cout\s*<<\s*"([^"]+)"\s*<<\s*endl/g);
 
       if (!matches || matches.length < 2) {
         throw "You must print at least 2 lines using cout.";
@@ -906,14 +912,20 @@ function showStatus(taskId, success, message) {
   msg.textContent = message;
 }
 
-  // FINAK SCORING ---
-  function calculateScore() {
+  // FINAL SCORING ---
+/*  function calculateScore() {
   const passed = taskResults.filter(t => t.passed).length;
   const total = TASKS.length;
   const percent = Math.round((passed / total) * 100);
 
   return { passed, total, percent };
-}
+} */
+  const { passed, total, percent } = calculateScore();
+
+// Update UI
+document.getElementById('res-score').textContent = `${passed}/${total}`;
+document.getElementById('rb-passed').textContent = passed;
+document.getElementById('rb-pct').textContent = percent + '%';
 
   // PROGRESS BAR UPDATE
 
@@ -926,13 +938,21 @@ function showStatus(taskId, success, message) {
 }
 
   // AUTO-GRADING IMPROVEMENTS
-  function updateTaskResult(taskId, passed) {
+ /* function updateTaskResult(taskId, passed) {
   const index = taskResults.findIndex(t => t.id === taskId);
 
   if (index !== -1) {
     taskResults[index].passed = passed;
   } else {
     taskResults.push({ id: taskId, passed });
+  }
+
+  updateProgress();
+} */
+  function updateTaskResult(taskId, passed) {
+  const task = taskResults.find(t => t.id === taskId);
+  if (task) {
+    task.passed = passed;
   }
 
   updateProgress();
