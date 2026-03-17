@@ -747,6 +747,7 @@ window.firebaseSignOut = async function() {
         <div class="fb-thanks-icon">🙏</div>
         <div class="fb-thanks-title">Thank you for your feedback!</div>
         <div class="fb-thanks-msg">Your response has been recorded. It will help <strong style="color:var(--text);">Instructor DEBULGADO, S.M.G</strong> improve the lesson for everyone in the class.</div>
+        <div id="fb-submit-status" style="margin-top:14px;font-size:0.78rem;color:var(--muted);"></div>
       </div>
 
     </div><!-- end feedback-panel -->
@@ -1226,7 +1227,7 @@ function submitFeedback(){
   const fbData = {
     type:           'FEEDBACK',
     timestamp:      new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'}),
-    student:        stuName        || (window.firebaseUser?.displayName) || 'Anonymous',
+    name:           stuName        || (window.firebaseUser?.displayName) || 'Anonymous',
     gmail:          window.firebaseEmail || 'N/A',
     section:        stuSection     || 'N/A',
     studentNo:      stuNo          || 'N/A',
@@ -1243,15 +1244,30 @@ function submitFeedback(){
   // Save locally
   localStorage.setItem('last_feedback', JSON.stringify(fbData));
 
-  // ── SEND TO GOOGLE SHEETS → "stdfeedback_cfp" sheet ──
-  if (SHEET_URL && !SHEET_URL.includes('YOUR_GOOGLE')) {
-    fetch(SHEET_URL, {
-      method: 'POST',
-      mode:   'no-cors',
-      headers: {'Content-Type': 'application/json'},
-      body:    JSON.stringify(fbData)
-    }).catch(()=>{});
-  }
+  // Hide form, show thanks immediately
+  document.getElementById('fb-form').style.display = 'none';
+  document.getElementById('fb-thanks').style.display = 'block';
+  document.getElementById('fb-thanks').scrollIntoView({behavior:'smooth'});
+
+  const statusEl = document.getElementById('fb-submit-status');
+  statusEl.style.color = 'var(--muted)';
+  statusEl.textContent = '⏳ Submitting feedback to Google Sheets…';
+
+  // ── SEND TO GOOGLE SHEETS ──
+  fetch(SHEET_URL, {
+    method:  'POST',
+    mode:    'no-cors',
+    headers: {'Content-Type': 'application/json'},
+    body:    JSON.stringify(fbData)
+  })
+  .then(() => {
+    statusEl.style.color = 'var(--accent2)';
+    statusEl.textContent = '✅ Feedback submitted to Google Sheets successfully!';
+  })
+  .catch(() => {
+    statusEl.style.color = '#f9c33a';
+    statusEl.textContent = '⚠️ Could not reach Google Sheets. Your feedback was saved locally.';
+  });
 
   // ── SAVE TO FIRESTORE ──
   if (window.firebaseUID && window._quizDB) {
@@ -1263,10 +1279,6 @@ function submitFeedback(){
         ).catch(()=>{});
       });
   }
-
-  document.getElementById('fb-form').style.display = 'none';
-  document.getElementById('fb-thanks').style.display = 'block';
-  document.getElementById('fb-thanks').scrollIntoView({behavior:'smooth'});
 }
 
 window.addEventListener('load',()=>{
