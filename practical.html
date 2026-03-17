@@ -885,6 +885,84 @@ function runTask(taskId) {
     showStatus(taskId, false, "❌ Compilation Error");
   }
 }
+
+  //  STATUS DISPLAY FUNCTION ---
+function showStatus(taskId, success, message) {
+  const el = document.getElementById(`task-status-${taskId}`);
+  const icon = el.querySelector(".ts-icon");
+  const msg = el.querySelector(".ts-msg");
+
+  el.classList.add("show");
+  el.classList.remove("pass", "try-again");
+
+  if (success) {
+    el.classList.add("pass");
+    icon.textContent = "✅";
+  } else {
+    el.classList.add("try-again");
+    icon.textContent = "⚠️";
+  }
+
+  msg.textContent = message;
+}
+
+  // FINAK SCORING ---
+  function calculateScore() {
+  const passed = taskResults.filter(t => t.passed).length;
+  const total = TASKS.length;
+  const percent = Math.round((passed / total) * 100);
+
+  return { passed, total, percent };
+}
+
+  // PROGRESS BAR UPDATE
+
+  function updateProgress() {
+  const total = TASKS.length;
+  const passed = taskResults.filter(t => t.passed).length;
+  const percent = (passed / total) * 100;
+
+  document.getElementById('prog-inner').style.width = percent + '%';
+}
+
+  // AUTO-GRADING IMPROVEMENTS
+  function updateTaskResult(taskId, passed) {
+  const index = taskResults.findIndex(t => t.id === taskId);
+
+  if (index !== -1) {
+    taskResults[index].passed = passed;
+  } else {
+    taskResults.push({ id: taskId, passed });
+  }
+
+  updateProgress();
+}
+
+  // CURRENT CHECKING LOGIC ---
+  function normalizeOutput(output) {
+  return output
+    .replace(/\r/g, '')        // remove Windows line endings
+    .trim()                    // remove outer spaces
+    .split('\n')
+    .map(line => line.trim()); // trim each line
+}
+
+function checkTask(taskId, output) {
+  const task = TASKS.find(t => t.id === taskId);
+  const lines = normalizeOutput(output);
+
+  if (task.flexible) {
+    // Task 1: must have at least 2 non-empty lines
+    const validLines = lines.filter(l => l.length > 0);
+    return validLines.length >= 2;
+  }
+
+  // Task 2: smarter checking
+  const hasSum = lines.some(l => l.includes("Sum: 15"));
+  const hasProduct = lines.some(l => l.includes("Product: 50"));
+
+  return hasSum && hasProduct;
+}
   
 /* function runTask(id){
   const code=document.getElementById('code-'+id).value; 
