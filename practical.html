@@ -608,8 +608,7 @@ window.firebaseSignOut = async function() {
 
     <div class="result-hero">
       <div class="result-glow"></div>
-      <!-- <div class="result-score-big" id="res-score">0/5</div> -->
-      <div class="result-score-big" id="res-score">0/2</div>
+      <div class="result-score-big" id="res-score">0/5</div>
       <div class="result-label">Tasks Completed (out of 2)</div>
       <h2 class="result-title" id="res-title">Session Complete</h2>
       <p class="result-msg" id="res-msg"></p>
@@ -710,14 +709,9 @@ int main() {
 
 let stuName='', stuNo='', stuSection='', startTime=null;
 let sessionTimer=null, sessionSeconds=3600;
-// let taskResults={};
-  let taskResults = {
-  { id: 1, passed: false },
-  { id: 2, passed: false }
-  };
+let taskResults=[];
 let submitted=false;
 
-  
 // ── START SESSION ──
 function startSession(){
   stuName=document.getElementById('inp-name').value.trim();
@@ -854,8 +848,7 @@ function runTask(taskId) {
 
     // Simulated execution logic
     if (taskId === 1) {
-     // const matches = code.match(/cout\s*<<\s*"([^"]+)"/g);
-      const matches = code.match(/cout\s*<<\s*"([^"]+)"\s*<<\s*endl/g);
+      const matches = code.match(/cout\s*<<\s*"([^"]+)"/g);
 
       if (!matches || matches.length < 2) {
         throw "You must print at least 2 lines using cout.";
@@ -876,19 +869,33 @@ function runTask(taskId) {
 
     outputPanel.textContent = output;
 
-    const passed = checkTask(taskId, output);
+    const pass = checkTask(taskId, output);
+    const task = TASKS.find(t => t.id === taskId);
 
-    //updateTaskResult(taskId, passed);
-taskResults[taskId] = {
-  pass: passed,
-  points: passed ? 50 : 0,
-  output: output
-};
-          
-    if (passed) {
-      showStatus(taskId, true, "✅ Correct!");
+    // Store result in the format expected by showResults / buildAnswerLog
+    taskResults[taskId] = {
+      code: document.getElementById('code-' + taskId).value,
+      output: output,
+      pass: pass,
+      points: pass ? task.points : 0
+    };
+
+    updateProgress();
+
+    if (pass) {
+      showStatus(taskId, true,
+        task.flexible
+          ? `Task ${taskId} passed! +${task.points} points — your name and course were printed successfully!`
+          : `Task ${taskId} passed! +${task.points} points — output matches perfectly!`
+      );
+      document.getElementById('task-card-' + taskId).style.borderColor = 'rgba(0,255,136,0.5)';
+      document.getElementById('task-card-' + taskId).style.boxShadow = '0 0 20px rgba(0,255,136,0.1)';
     } else {
-      showStatus(taskId, false, "⚠️ Output mismatch.");
+      showStatus(taskId, false,
+        task.flexible
+          ? `⚠️ Make sure you print at least 2 lines using cout << "..." << endl;`
+          : `⚠️ Output doesn't match. Expected:\n${task.expected.replace(/\\n/g, '\n')}`
+      );
     }
 
   } catch (err) {
@@ -907,16 +914,7 @@ function showStatus(taskId, success, message) {
   el.classList.add("show");
   el.classList.remove("pass", "try-again");
 
-/* if (passed === 2) {
-  resMsg = "Perfect! All tasks correct.";
-
-} else if (passed === 1) {
-  resMsg = "One task correct. Review the other.";
-} else {
-  resMsg = "No correct tasks. Practice more.";
-}
-*/
-     if (success) {
+  if (success) {
     el.classList.add("pass");
     icon.textContent = "✅";
   } else {
@@ -927,51 +925,23 @@ function showStatus(taskId, success, message) {
   msg.textContent = message;
 }
 
-
-  // FINAL SCORING ---
+  // FINAK SCORING ---
   function calculateScore() {
   const passed = taskResults.filter(t => t.passed).length;
   const total = TASKS.length;
   const percent = Math.round((passed / total) * 100);
 
   return { passed, total, percent };
-} 
-  const { passed, total, percent } = calculateScore();
-
-// Update UI
-document.getElementById('res-score').textContent = `${passed}/${total}`;
-document.getElementById('rb-passed').textContent = passed;
-document.getElementById('rb-pct').textContent = percent + '%';
+}
 
   // PROGRESS BAR UPDATE
 
   function updateProgress() {
   const total = TASKS.length;
-  const passed = taskResults.filter(t => t.passed).length;
+  const passed = Object.values(taskResults).filter(r => r && r.pass).length;
   const percent = (passed / total) * 100;
 
   document.getElementById('prog-inner').style.width = percent + '%';
-}
-
-  // AUTO-GRADING IMPROVEMENTS
- /* function updateTaskResult(taskId, passed) {
-  const index = taskResults.findIndex(t => t.id === taskId);
-
-  if (index !== -1) {
-    taskResults[index].passed = passed;
-  } else {
-    taskResults.push({ id: taskId, passed });
-  }
-
-  updateProgress();
-} */
-  function updateTaskResult(taskId, passed) {
-  const task = taskResults.find(t => t.id === taskId);
-  if (task) {
-    task.passed = passed;
-  }
-
-  updateProgress();
 }
 
   // CURRENT CHECKING LOGIC ---
@@ -998,6 +968,16 @@ function checkTask(taskId, output) {
   const hasProduct = lines.some(l => l.includes("Product: 50"));
 
   return hasSum && hasProduct;
+}
+
+function clearOutput(id){
+  const out = document.getElementById('output-' + id);
+  out.className = 'output-panel idle';
+  out.textContent = '// Output will appear here after you click ▶ Run Code';
+  const ts = document.getElementById('task-status-' + id);
+  ts.classList.remove('show','pass','try-again');
+  const status = document.getElementById('status-' + id);
+  if(status) status.textContent = '';
 }
   
 /* function runTask(id){
@@ -1150,13 +1130,9 @@ function showResults(isAuto){
   document.getElementById('global-timer-bar').classList.remove('show');
   document.getElementById('result-screen').style.display='block';
 
-  /* const passed=Object.values(taskResults).filter(r=>r&&r.pass).length;
+  const passed=Object.values(taskResults).filter(r=>r&&r.pass).length;
   const totalPts=Object.values(taskResults).filter(r=>r&&r.pass).reduce((s,r)=>s+r.points,0);
-  const pct=Math.round(totalPts); */ 
-const total = 2;
-const passed = Object.values(taskResults).filter(r => r && r.pass).length;
-const pct = Math.round((passed / total) * 100);
-        // 50 pts each = 100% max
+  const pct=Math.round(totalPts); // 50 pts each = 100% max
   const elapsed=Math.round((new Date()-startTime)/1000);
   const em=Math.floor(elapsed/60), es=elapsed%60;
   const timeStr=String(em).padStart(2,'0')+'m '+String(es).padStart(2,'0')+'s';
@@ -1171,10 +1147,8 @@ const pct = Math.round((passed / total) * 100);
     [50,'✅ Half Done — 50%!','You passed one task. Try the other one — you can do it!'],
     [0,'📖 Keep Practicing!','Don\'t give up — re-read the lesson and try again. You\'re learning!']
   ];
-//  const [,title,msg]=msgs.find(([t])=>pct>=t);
- // document.getElementById('res-title').textContent=title;
-  const statusText = passed === 2 ? "PASSED ✅" : "WRONG ❌";
-document.getElementById('res-title').textContent = statusText;
+  const [,title,msg]=msgs.find(([t])=>pct>=t);
+  document.getElementById('res-title').textContent=title;
   document.getElementById('res-msg').textContent=msg;
 
   submitToSheets(passed, pct, timeStr, isAuto || false);
@@ -1283,7 +1257,7 @@ function sendEmail(){
   // Since we can't actually send email from client-side, open mailto
   const passed=Object.values(taskResults).filter(r=>r&&r.pass).length;
   const pct=Object.values(taskResults).filter(r=>r&&r.pass).reduce((s,r)=>s+r.points,0);
-  const body=`Week 1 Practical Assessment Results\n\nName: ${stuName}\nSection: ${stuSection}\nScore: ${passed}/2 (${pct}%)\n\nTask Results:\n${TASKS.map(t=>{const r=taskResults[t.id];return `Task ${t.id}: ${r&&r.pass?'PASSED':'—'}`;}).join('\n')}\n\nInstructor: DEBULGADO, S.M.G\nComputer Fundamentals and Programming`;
+  const body=`Week 1 Practical Assessment Results\n\nName: ${stuName}\nSection: ${stuSection}\nScore: ${passed}/5 (${pct}%)\n\nTask Results:\n${TASKS.map(t=>{const r=taskResults[t.id];return `Task ${t.id}: ${r&&r.pass?'PASSED':'—'}`;}).join('\n')}\n\nInstructor: DEBULGADO, S.M.G\nComputer Fundamentals and Programming`;
   window.location.href=`mailto:${email}?subject=Week 1 Practical Results — ${stuName}&body=${encodeURIComponent(body)}`;
   document.getElementById('email-status').classList.add('show');
 }
@@ -1292,7 +1266,7 @@ function sendEmail(){
 function downloadPDF(){
   const passed=Object.values(taskResults).filter(r=>r&&r.pass).length;
   const pct=Object.values(taskResults).filter(r=>r&&r.pass).reduce((s,r)=>s+r.points,0);
-  const content=`WEEK 1 PRACTICAL ASSESSMENT\nComputer Fundamentals and Programming\nInstructor: DEBULGADO, S.M.G\n${'='.repeat(50)}\nStudent: ${stuName}\nSection: ${stuSection}\nDate: ${new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'})}\n${'='.repeat(50)}\nFINAL SCORE: ${passed}/2 tasks (${pct}%)\n${'='.repeat(50)}\n\n${TASKS.map(t=>{const r=taskResults[t.id];return `TASK ${t.id}: ${t.title}\nResult: ${r&&r.pass?'PASSED ✓':'Not passed'}\nPoints: ${r&&r.pass?t.points:0}/${t.points}\nOutput:\n${r?r.output:'(not attempted)'}\n${'-'.repeat(40)}`;}).join('\n\n')}`;
+  const content=`WEEK 1 PRACTICAL ASSESSMENT\nComputer Fundamentals and Programming\nInstructor: DEBULGADO, S.M.G\n${'='.repeat(50)}\nStudent: ${stuName}\nSection: ${stuSection}\nDate: ${new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'})}\n${'='.repeat(50)}\nFINAL SCORE: ${passed}/5 tasks (${pct}%)\n${'='.repeat(50)}\n\n${TASKS.map(t=>{const r=taskResults[t.id];return `TASK ${t.id}: ${t.title}\nResult: ${r&&r.pass?'PASSED ✓':'Not passed'}\nPoints: ${r&&r.pass?t.points:0}/${t.points}\nOutput:\n${r?r.output:'(not attempted)'}\n${'-'.repeat(40)}`;}).join('\n\n')}`;
   const blob=new Blob([content],{type:'text/plain'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
